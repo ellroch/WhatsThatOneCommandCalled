@@ -1,0 +1,31 @@
+#  export fpath=( ~/.myfunctions "${fpath[@]}" )
+
+#  chmod +x filename
+
+#  the "autoload -Uz filename" for this directory is declared at the bottom of ~/.zshrc
+#  add your own custom aliases in ~/.zshrc under that autoload in the future for ease of use
+#  add your own custom environment variable defaults as exports there as well
+#  any more complex functionality than aliasing belongs here as a function file
+
+
+
+
+### custom enviornment variables (defaults)
+# $workspace
+if [ -f ".conf/.workspace" ]; then
+    export workspace="$(<.conf/.workspace)"
+else 
+    export workspace="~/Desktop/work/default"
+fi
+
+# $projectname
+if [ -f ".conf/.projectname" ]; then
+    export projectname="$(<.conf/.projectname)"
+else 
+    export projectname="default"
+fi
+
+
+  
+# autoload custom functions
+autoload -Uz ~/.myfunctions/ScriptsGoHere/**/*
