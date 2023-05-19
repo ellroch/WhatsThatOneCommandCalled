@@ -1,31 +1,31 @@
-#  export fpath=( ~/.myfunctions "${fpath[@]}" )
+#  It may not be necessary to export the directory to the fpath.  not 100% sure. I did when floundering around figuring this out and mine works.
+#  but I'm pretty sure it's not necessary.
+#  export fpath=( ~/Path_To_This_Dir "${fpath[@]}" )
+#  chmod +x <function/script filename>
 
-#  chmod +x filename
-
-#  the "autoload -Uz filename" for this directory is declared at the bottom of ~/.zshrc
+#  the "autoload -Uz" for these files neet do be declared at the bottom of ~/.zshrc
 #  add your own custom aliases in ~/.zshrc under that autoload in the future for ease of use
 #  add your own custom environment variable defaults as exports there as well
 #  any more complex functionality than aliasing belongs here as a function file
 
-
-
-
-### custom enviornment variables (defaults)
+#=======================================================================================
+### custom enviornment variables (defaults) to add to the .zshrc file for these scripts
+#=======================================================================================
 # $workspace
 if [ -f ".conf/.workspace" ]; then
     export workspace="$(<.conf/.workspace)"
 else 
     export workspace="~/Desktop/work/default"
 fi
-
+#=======================================================================================
 # $projectname
 if [ -f ".conf/.projectname" ]; then
     export projectname="$(<.conf/.projectname)"
 else 
     export projectname="default"
 fi
-
+#=======================================================================================
 
   
-# autoload custom functions
-autoload -Uz ~/.myfunctions/ScriptsGoHere/**/*
+# autoload the custom functions
+autoload -Uz ~/Path_To_This_Dir/ScriptsGoHere/**/*
