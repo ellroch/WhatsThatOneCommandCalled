@@ -1,0 +1,6 @@
+#!/bin/zsh
+# hides history
+hidehist () {
+	export HISTSIZE="0"
+	echo "export HISTSIZE=\"0\""
+};

@@ -1,0 +1,17 @@
+#!/bin/zsh
+# create workspace structure with name given as a parameter
+mkspace () {
+echo "\n   mkspace() commands:"
+echo " + mkdir -pv \$1/{.conf,.recon,.scanning,.exploitation,.post_exploitation,report/{overview_of_findings,known_vulns,suspected_vulns,known_machines,known_services,logs}}"
+echo " + echo \"\$(pwd)/\$1\" > \$1/.conf/.workspace"
+echo " + echo \$1 > \$1/.conf/.projectname"
+echo " + cd \$1"
+echo " + prepenv"
+echo " + echo \"pwd: \$(pwd)\"\n"
+  mkdir -pv $1/{.conf,.recon,.scanning,.exploitation,.post_exploitation,report/{overview_of_findings,known_vulns,suspected_vulns,known_machines,known_services}}
+  echo "$(pwd)/$1" > $1/.conf/.workspace
+  echo $1 > $1/.conf/.projectname
+  cd $1
+  prepenv
+  echo "pwd: $(pwd)"
+};

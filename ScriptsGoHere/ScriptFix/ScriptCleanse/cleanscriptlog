@@ -1,0 +1,61 @@
+#!/bin/zsh
+# this cleans the script file defined in $scriptlog of all formatting trash leftover from zsh
+cleanscript() {
+  # Remove backspaces (0x08), escape (0x1B), and non-printable characters but retain newlines and tab characters
+  tr -cd '\11\12\15\40-\176' < $scriptlog > $scriptlog.temp
+col -bp < $scriptlog > $scriptlog.temp
+cat $scriptlog.temp |
+# Removes ANSI color codes
+	sed 's/\x1b\[[0-9;]*m//g' |
+# Removes non-printable characters
+	tr -cd '\11\12\15\40-\176' |
+# Removes terminal escape sequences
+	sed 's/\x1b[^m]*m//g' |
+# Removes more color codes
+	sed 's/\x1b\[.\{1,5\}m//g' |
+# Removes terminal escape sequences for cursor positioning
+	sed 's/\x1b\[.\{1,5\}H//g' |
+# Removes terminal escape sequences for cursor movement
+	sed 's/\x1b\[[0-9;]*H//g' |
+# Removes terminal escape sequences for erasing parts of the line
+	sed 's/\x1b\[[0-9;]*K//g' |
+# Removes terminal escape sequences for clearing the screen
+	sed 's/\x1b\[[0-9;]*J//g' |
+# Removes shift in/out characters
+	sed 's/\x0f//g' |
+# Removes backspaces
+	sed 's///g' |
+# Removes terminal window title sequences
+	sed 's/]0;//g' |
+# Removes carriage return characters
+	sed 's/\r//g' |
+# Removes remaining problematic color sequences
+	sed 's/\x1b\[[0-9;]*38;2;[0-9]*;[0-9]*;[0-9]*m//g' |
+# Use sed to remove ANSI escape sequences more comprehensively
+	sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" |
+# Removes remaining escape sequences
+	sed 's/\x1b\[0m//g' |
+# Removes unidentified terminal formatting sequences 	
+	sed 's/K?1h?2004h//g' |
+	sed 's/?1l?2004l//g' |	
+	sed -r 's/37m(.)?//g' |
+	sed -r 's/[0-9]{1,5}(m|h)J?//g' |
+# Removes lines until the first line of interest appears
+	awk '/Script started on/ {f=1} f' |
+# Removes lines after the last line of interest appears
+	awk '/Script done on/ {exit}1' |
+# add back some formatting to the prompts for readability
+  awk '
+  {
+    gsub(/\x1b\[[0-9;]*m|\x1b\[[0-9;]*H|\x1b\[[0-9;]*K|\x1b\[[0-9;]*J/, "", $0)
+    if ($0 ~ /\(/ && $0 ~ /\)/ && $0 ~ /\//)
+      print "┌──" $0
+    else if ($0 ~ /\$/)
+      print "└─" $0
+    else
+      print $0
+  }
+  ' |
+  sed "/^0;$USER@$HOST:/d" > $scriptlog.clean
+  rm $scriptlog.temp
+};

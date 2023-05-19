@@ -1,0 +1,13 @@
+#!/bin/zsh
+# this prepares the shell for the script command by swapping to the ~/.zshrc.scriptmode config (disabling auto-suggest) and setting the $scriptlog
+savestart () {
+	echo ""
+	echo ""
+	echo -e "\e[31;5m--- ! ! ! DO_NOT_FORGET_INTRO ! ! ! ---\e[0m"
+	echo ""
+	echo ""
+	export scriptlog="$workspace/report/logs/$projectname.`date | sed 's/ /./g'`.log"
+	script $scriptlog
+	echo "export scriptlog=\"$workspace/report/logs/$projectname.`date | sed 's/ /./g'`.log\""
+	echo "script $scriptlog"
+};

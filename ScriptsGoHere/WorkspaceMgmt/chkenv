@@ -1,0 +1,11 @@
+#!/bin/zsh
+# this prints the custom environment variables used by these functions as they are currently set
+chkenv () {
+  echo "__Native_Vars__"
+  echo "\$HISTSIZE     = \"$HISTSIZE\""
+  echo ""
+  echo "__Custom_VARS__"
+  echo "\$workspace    = \"$workspace\""
+  echo "\$projectname  = \"$projectname\""
+  echo "\$scriptlog    = \"$scriptlog\""
+};

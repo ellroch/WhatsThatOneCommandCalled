@@ -1,0 +1,6 @@
+#!/bin/zsh
+# shows history
+showhist () {
+	export HISTSIZE="1000"
+	echo "export HISTSIZE=\"1000\""
+};

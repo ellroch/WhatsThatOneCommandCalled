@@ -1,0 +1,10 @@
+#!/bin/zsh
+# this restores the default config (enabling auto-suggest) and cleans the log file specified by $scriptlog using the cleanscript function
+saveend () {
+	echo "cleanscript $scriptlog"
+	echo ""
+	echo "script concludes: $(date)"
+	echo "exit"
+	cleanscript $scriptlog
+	exit
+};

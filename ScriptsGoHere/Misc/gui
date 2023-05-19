@@ -1,0 +1,11 @@
+#!/bin/zsh
+# this prints the custom environment variables used by these functions as they are currently set
+gui () {
+  if [ -z "$1" ]; then
+    xdg-open .
+    echo "xdg-open $(pwd)"
+  else 
+    xdg-open $1
+    echo "xdg-open $1"
+  fi
+};
