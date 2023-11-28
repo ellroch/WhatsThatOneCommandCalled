@@ -29,3 +29,24 @@ fi
   
 # autoload the custom functions
 autoload -Uz ~/Path_To_This_Dir/ScriptsGoHere/**/*
+
+
+
+
+
+#===========================================================
+### main functions
+#===========================================================
+
+- [ ] mkspace \[workspace_name\]
+	- [ ] prepenv
+	- [ ] chkenv
+- [ ] savestart
+	- [ ] intro
+	- [ ] saveend
+
+- [ ] nmap scans:
+	- [ ] scan (calls all below scans)
+	- [ ] udpscan (scans both tcp/udp)
+	- [ ] nullscan
+	- [ ] xmasscan
