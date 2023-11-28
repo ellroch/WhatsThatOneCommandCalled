@@ -3,7 +3,7 @@
 # defaults to the target list in the workspace $workspace/.conf/.targets
 # writes results to $workspace/.scanning/nmap/...
 scan () {
-  echo "running the following scans on: $1"
+  echo "running the following scans:"
   echo " - 2x udp scans"
   echo " - 2x null scans"
   echo " - 2x xmas scans"
