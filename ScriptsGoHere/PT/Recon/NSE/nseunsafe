@@ -9,22 +9,22 @@ nseunsafe () {
 
   echo "running first NSE scan"
   if [ -z "$1" ]; then 
-  sudo nmap --script "safe,default,intrusive" -iL "$workspace/.conf/.targets" -oA "$workspace/.scanning/NSE/NSE-.targets-1-`date | sed 's/ /./g'`"
+  sudo nmap --script "safe,default,intrusive" -iL "$workspace/.conf/.targets" -oA "$workspace/.scanning/nse/nse-.targets-1-`date | sed 's/ /./g'`"
   else 
     if [ -z "$2" ]; then 
-      sudo nmap --script "safe,default,intrusive" -iL $1 -oA "$workspace/.scanning/NSE/NSE-$1-1-`date | sed 's/ /./g'`"
+      sudo nmap --script "safe,default,intrusive" -iL $1 -oA "$workspace/.scanning/nse/nse-$1-1-`date | sed 's/ /./g'`"
     else 
-    sudo nmap --script "safe,default,intrusive" -iL $1 -oA "$workspace/.scanning/NSE/NSE-$2-1-`date | sed 's/ /./g'`"
+    sudo nmap --script "safe,default,intrusive" -iL $1 -oA "$workspace/.scanning/nse/nse-$2-1-`date | sed 's/ /./g'`"
     fi
   fi
   echo "running second NSE scan"
   if [ -z "$1" ]; then 
-  sudo nmap --script "safe,default,intrusive" -iL "$workspace/.conf/.targets" -oA "$workspace/.scanning/NSE/NSE-.targets-2-`date | sed 's/ /./g'`"
+  sudo nmap --script "safe,default,intrusive" -iL "$workspace/.conf/.targets" -oA "$workspace/.scanning/nse/nse-.targets-2-`date | sed 's/ /./g'`"
   else 
     if [ -z "$2" ]; then 
-      sudo nmap --script "safe,default,intrusive" -iL $1 -oA "$workspace/.scanning/NSE/NSE-$1-2-`date | sed 's/ /./g'`"
+      sudo nmap --script "safe,default,intrusive" -iL $1 -oA "$workspace/.scanning/nse/nse-$1-2-`date | sed 's/ /./g'`"
     else 
-    sudo nmap --script "safe,default,intrusive" -iL $1 -oA "$workspace/.scanning/NSE/NSE-$2-2-`date | sed 's/ /./g'`"
+    sudo nmap --script "safe,default,intrusive" -iL $1 -oA "$workspace/.scanning/nse/nse-$2-2-`date | sed 's/ /./g'`"
     fi
   fi
   echo "NSE scans complete"
