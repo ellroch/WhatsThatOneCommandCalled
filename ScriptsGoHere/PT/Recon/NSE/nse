@@ -1,0 +1,31 @@
+#!/bin/zsh
+# run a nse scan of a given target list
+# defaults to the target list in the workspace $workspace/.conf/.targets
+# writes results to $workspace/.scanning/nmap/...
+nse () {
+  if [ ! -d "$workspace/.scanning/nse" ]; then
+    mkdir $workspace/.scanning/nse
+  fi
+
+  echo "running first NSE scan"
+  if [ -z "$1" ]; then 
+  sudo nmap --script "safe,default" -iL "$workspace/.conf/.targets" -oA "$workspace/.scanning/NSE/NSE-.targets-1-`date | sed 's/ /./g'`"
+  else 
+    if [ -z "$2" ]; then 
+      sudo nmap --script "safe,default" -iL $1 -oA "$workspace/.scanning/NSE/NSE-$1-1-`date | sed 's/ /./g'`"
+    else 
+    sudo nmap --script "safe,default" -iL $1 -oA "$workspace/.scanning/NSE/NSE-$2-1-`date | sed 's/ /./g'`"
+    fi
+  fi
+  echo "running second NSE scan"
+  if [ -z "$1" ]; then 
+  sudo nmap --script "safe,default" -iL "$workspace/.conf/.targets" -oA "$workspace/.scanning/NSE/NSE-.targets-2-`date | sed 's/ /./g'`"
+  else 
+    if [ -z "$2" ]; then 
+      sudo nmap --script "safe,default" -iL $1 -oA "$workspace/.scanning/NSE/NSE-$1-2-`date | sed 's/ /./g'`"
+    else 
+    sudo nmap --script "safe,default" -iL $1 -oA "$workspace/.scanning/NSE/NSE-$2-2-`date | sed 's/ /./g'`"
+    fi
+  fi
+  echo "NSE scans complete"
+};
