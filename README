@@ -38,15 +38,19 @@ autoload -Uz ~/Path_To_This_Dir/ScriptsGoHere/**/*
 ### main functions
 #===========================================================
 
-- [ ] mkspace \[workspace_name\]
-	- [ ] prepenv
-	- [ ] chkenv
-- [ ] savestart
-	- [ ] intro
-	- [ ] saveend
+- [ ] mkspace [workspace_name]
+	- [ ] prepenv : called from from root of workspace (mkspace) to prepare environment variables
+	- [ ] chkenv  (lists environment variables used by these functions
+- [ ] savestart (begins stranscript ("man script" for more info) with setting adjustments to minimize clutter from autocomplete)
+	- [ ] intro (writes context for the transcript)
+	- [ ] saveend (cleans the script of non-text formatting information)
 
-- [ ] nmap scans:
-	- [ ] scan (calls all below scans)
-	- [ ] udpscan (scans both tcp/udp)
-	- [ ] nullscan
-	- [ ] xmasscan
+- [ ] nmap scans: defaults to [$workspace/.conf/.targets] [...targets-[1|2]-`date | sed 's/ /./g'`]
+	- [ ] scan [target list file][filename - saved to $workspace/.scanning/nmap/...] (calls all below scans)
+	- [ ] udpscan [target list file][filename - saved to $workspace/.scanning/nmap/...] (scans both tcp/udp)
+	- [ ] nullscan [target list file][filename - saved to $workspace/.scanning/nmap/...]
+	- [ ] xmasscan [target list file][filename - saved to $workspace/.scanning/nmap/...]
+- [ ] NSE:
+	- [ ] nse [target list file][filename - saved to $workspace/.scanning/nse/...]
+	- [ ] nsesafe [target list file][filename - saved to $workspace/.scanning/nse/...]
+	- [ ] nseunsafe [target list file][filename - saved to $workspace/.scanning/nse/...]
