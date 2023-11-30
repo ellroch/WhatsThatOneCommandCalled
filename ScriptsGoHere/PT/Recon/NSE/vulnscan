@@ -9,22 +9,22 @@ vulnscan () {
 
   echo "running first NSE scan"
   if [ -z "$1" ]; then 
-  sudo nmap --script vulners/ -sSUV -p- -Pn -r -O -iL "$workspace/.conf/.targets" -oA "$workspace/.scanning/nmap-vulners/nmap-vulnscan.targets-1-`date | sed 's/ /./g'`"
+  sudo nmap --script vulners -sSUV -p- -Pn -r -O -iL "$workspace/.conf/.targets" -oA "$workspace/.scanning/nmap-vulners/nmap-vulnscan.targets-1-`date | sed 's/ /./g'`"
   else 
     if [ -z "$2" ]; then 
-      sudo nmap --script vulners/ -sSUV -p- -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap-vulners/nmap-vulnscan$1-1-`date | sed 's/ /./g'`"
+      sudo nmap --script vulners -sSUV -p- -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap-vulners/nmap-vulnscan$1-1-`date | sed 's/ /./g'`"
     else 
-    sudo nmap --script vulners/ -sSUV -p- -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap-vulners/nmap-vulnscan$2-1-`date | sed 's/ /./g'`"
+    sudo nmap --script vulners -sSUV -p- -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap-vulners/nmap-vulnscan$2-1-`date | sed 's/ /./g'`"
     fi
   fi
   echo "running second NSE scan"
   if [ -z "$1" ]; then 
-  sudo nmap --script vulners/ -sSUV -p- -Pn -r -O -iL "$workspace/.conf/.targets" -oA "$workspace/.scanning/nmap-vulners/nmap-vulnscan.targets-2-`date | sed 's/ /./g'`"
+  sudo nmap --script vulners -sSUV -p- -Pn -r -O -iL "$workspace/.conf/.targets" -oA "$workspace/.scanning/nmap-vulners/nmap-vulnscan.targets-2-`date | sed 's/ /./g'`"
   else 
     if [ -z "$2" ]; then 
-      sudo nmap --script vulners/ -sSUV -p- -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap-vulners/nmap-vulnscan$1-2-`date | sed 's/ /./g'`"
+      sudo nmap --script vulners -sSUV -p- -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap-vulners/nmap-vulnscan$1-2-`date | sed 's/ /./g'`"
     else 
-    sudo nmap --script vulners/ -sSUV -p- -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap-vulners/nmap-vulnscan$2-2-`date | sed 's/ /./g'`"
+    sudo nmap --script vulners -sSUV -p- -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap-vulnersnmap-vulnscan$2-2-`date | sed 's/ /./g'`"
     fi
   fi
   echo "NSE scans complete"
