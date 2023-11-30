@@ -2,7 +2,7 @@
 # run a nse scan of a given target list
 # defaults to the target list in the workspace $workspace/.conf/.targets
 # writes results to $workspace/.scanning/nmap/...
-nsesafe () {
+vulnscan () {
   if [ ! -d "$workspace/.scanning/nmap-vulners" ]; then
     mkdir $workspace/.scanning/nmap-vulners
   fi
