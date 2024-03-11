@@ -8,4 +8,5 @@ chkenv () {
   echo "\$workspace    = \"$workspace\""
   echo "\$projectname  = \"$projectname\""
   echo "\$scriptlog    = \"$scriptlog\""
+  echo "\$return_dir   = \"$return_dir\""
 };

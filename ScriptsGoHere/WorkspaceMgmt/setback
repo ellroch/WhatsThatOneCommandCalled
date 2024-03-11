@@ -1,0 +1,8 @@
+#!/bin/zsh
+# sets the return directory for the goback command to cd into
+# this should be used before using cd within a convenience script
+setback () {
+echo "\n   setback() commands:"
+echo " + export return_dir=\"\$(pwd)\""
+  export return_dir="$(pwd)"
+};

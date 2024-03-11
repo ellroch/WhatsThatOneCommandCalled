@@ -1,0 +1,8 @@
+#!/bin/zsh
+# sets the return directory for the goback command to cd into
+# this should be used before using cd within a convenience script
+goback () {
+echo "\n   goback() commands:"
+echo " + cd $return_dir"
+  cd $return_dir
+};
