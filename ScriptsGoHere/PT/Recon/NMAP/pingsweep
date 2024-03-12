@@ -1,0 +1,32 @@
+#!/bin/zsh
+# run a nse scan of a given target list
+# defaults to the target list in the workspace $workspace/.conf/.targets
+# writes results to $workspace/.scanning/nmap/...
+pingsweep () {
+  if [ ! -d "$workspace/.scanning/nmap" ]; then
+    mkdir $workspace/.scanning/nmap
+  fi
+
+  echo "results will be stored in $workspace/.scanning/nmap/..."
+  echo "running first ping sweep 'fping -a'"
+  if [ -z "$1" ]; then 
+  sudo fping -a < $workspace/.conf/.targets 2>/dev/null > "$workspace/.scanning/nmap/pingsweep-.targets-1-$(date +%F)`date | sed 's/ /./g'`"
+  else 
+    if [ -z "$2" ]; then 
+    sudo fping -a < $1 2>/dev/null > "$workspace/.scanning/nmap/pingsweep-$1-1-$(date +%F)`date | sed 's/ /./g'`"
+    else 
+    sudo fping -a < $1 2>/dev/null > "$workspace/.scanning/nmap/pingsweep-$2-1-$(date +%F)`date | sed 's/ /./g'`"
+    fi
+  fi
+  echo "running second ping sweep 'fping -a'"
+  if [ -z "$1" ]; then 
+  sudo fping -a < $workspace/.conf/.targets 2>/dev/null > "$workspace/.scanning/nmap/pingsweep-.targets-2-$(date +%F)`date | sed 's/ /./g'`"
+  else 
+    if [ -z "$2" ]; then 
+    sudo fping -a < $1 2>/dev/null > "$workspace/.scanning/nmap/pingsweep-$1-2-$(date +%F)`date | sed 's/ /./g'`"
+    else 
+    sudo nfping -a < $1 2>/dev/null > "$workspace/.scanning/nmap/pingsweep-$2-2-$(date +%F)`date | sed 's/ /./g'`"
+    fi
+  fi
+  echo "ping sweeps complete"
+};

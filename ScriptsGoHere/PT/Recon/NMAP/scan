@@ -8,10 +8,9 @@ scan () {
   else 
     echo "running the following scans on $1:"
   fi
-  echo " - 2x udp scans"
+  echo " - 2x syn/udp scans"
   echo " - 2x null scans"
   echo " - 2x xmas scans"
-  echo "results will be stored in $workspace/.scanning/nmap/..."
   udpscan $1 $2
   nullscan $1 $2
   xmasscan $1 $2

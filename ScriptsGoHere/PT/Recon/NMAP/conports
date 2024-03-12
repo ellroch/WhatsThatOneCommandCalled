@@ -1,0 +1,34 @@
+#!/bin/zsh
+# run a nse scan of a given target list
+# defaults to the target list in the workspace $workspace/.conf/.targets
+# writes results to $workspace/.scanning/nmap/...
+conports () {
+  if [ ! -d "$workspace/.scanning/nmap" ]; then
+    mkdir $workspace/.scanning/nmap
+  fi
+
+  echo "results will be stored in $workspace/.scanning/nmap/..."
+  echo "running first tcp connect scan 'sudo nmap -sTV -Pn -r -O -p$1'"
+  if [ -z "$1" ]; then 
+  echo "!!  This command requires a list of ports as the first argument and optionally an output filename as a second argument"
+  echo "!!  Example: 80,443,8080 or 1-1024"
+  else 
+    if [ -z "$2" ]; then 
+    sudo nmap -sTV -Pn -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/conports-.targets_$1-1-$(date +%F)`date | sed 's/ /./g'`"
+    else 
+    sudo nmap -sTV -Pn -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/conports-.targets_$2-1-$(date +%F)`date | sed 's/ /./g'`"
+    fi
+  fi
+  echo "running second tcp connect scan 'sudo nmap -sTV -Pn -r -O -p$1'"
+  if [ -z "$1" ]; then 
+  echo "!!  This command requires a list of ports as the first argument and optionally an output filename as a second argument"
+  echo "!!  Example: 80,443,8080 or 1-1024  "
+  else 
+    if [ -z "$2" ]; then 
+    sudo nmap -sTV -Pn -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/conscan-$1-2-$(date +%F)`date | sed 's/ /./g'`"
+    else 
+    sudo nmap -sTV -Pn -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/conscan-$2-2-$(date +%F)`date | sed 's/ /./g'`"
+    fi
+  fi
+  echo "tcp connect scans complete"
+};
