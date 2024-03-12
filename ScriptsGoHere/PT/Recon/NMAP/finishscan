@@ -1,0 +1,32 @@
+#!/bin/zsh
+# run a nse scan of a given target list
+# defaults to the target list in the workspace $workspace/.conf/.targets
+# writes results to $workspace/.scanning/nmap/...
+finishscan () {
+  if [ ! -d "$workspace/.scanning/nmap" ]; then
+    mkdir $workspace/.scanning/nmap
+  fi
+
+  echo "results will be stored in $workspace/.scanning/nmap/..."
+  echo "running first syn/udp scan of the remaining 64535 ports 'sudo nmap -sSUV -p1000-65535  -Pn -r -O'"
+  if [ -z "$1" ]; then 
+  sudo nmap -sSUV -p1000-65535  -Pn -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/finishscan_64k-.targets-1-$(date +%F)`date | sed 's/ /./g'`"
+  else 
+    if [ -z "$2" ]; then 
+    sudo nmap -sSUV -p1000-65535  -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/finishscan_64k-$1-1-$(date +%F)`date | sed 's/ /./g'`"
+    else 
+    sudo nmap -sSUV -p1000-65535  -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/finishscan_64k-$2-1-$(date +%F)`date | sed 's/ /./g'`"
+    fi
+  fi
+  echo "running second syn/udp scan of the remaining 64535 ports 'sudo nmap -sSUV -p1000-65535  -Pn -r -O'"
+  if [ -z "$1" ]; then 
+  sudo nmap -sSUV -p1000-65535 -Pn -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/finishscan_64k-.targets-2-$(date +%F)`date | sed 's/ /./g'`"
+  else 
+    if [ -z "$2" ]; then 
+    sudo nmap -sSUV -p1000-65535  -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/finishscan_64k-$1-2-$(date +%F)`date | sed 's/ /./g'`"
+    else 
+    sudo nmap -sSUV -p1000-65535  -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/finishscan_64k-$2-2-$(date +%F)`date | sed 's/ /./g'`"
+    fi
+  fi
+  echo "syn/udp scans complete"
+};

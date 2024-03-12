@@ -1,0 +1,18 @@
+#!/bin/zsh
+# run some nmap scans of a given target list
+# defaults to the target list in the workspace $workspace/.conf/.targets
+# writes results to $workspace/.scanning/nmap/...
+routinescan () {
+  if [ -z "$1" ]; then 
+    echo "running the following scans on targets in $workspace/.conf/.targets:"
+  else 
+    echo "running the following scans on $1:"
+  fi
+  echo " - 2x syn scans"
+  echo " - 2x udp scans"
+  echo " - 2x xmas scans"
+  udpscan $1 $2
+  nullscan $1 $2
+  xmasscan $1 $2
+  echo "all scans complete"
+};
