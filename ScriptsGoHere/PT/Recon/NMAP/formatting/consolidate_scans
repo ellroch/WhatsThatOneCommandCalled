@@ -10,6 +10,8 @@ consolidate_scans () {
 
   echo "results will be stored in $workspace/.scanning/nmap/consolidated_results/"
   python $script_dir/PT/Recon/NMAP/formatting/consolidate_scans.py $workspace/.scanning/nmap/ $workspace/.scanning/nmap/consolidated_results/$1 $workspace/.scanning/nmap/consolidated_results/CVEs.json
+  
+  python $script_dir/PT/Recon/NMAP/formatting/consolidate_scans.py $workspace/.scanning/nmap/ $workspace/.scanning/nmap/consolidated_results/$1 --cve_output_json $workspace/.scanning/nmap/consolidated_results/CVEs.json --kev_catalog_path $workspace/.scanning/nmap/consolidated_results/CISA_KEV_Catalog.csv
   echo "Consolidation complete"
   echo ""
 };
