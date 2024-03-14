@@ -32,7 +32,7 @@ import logging
 # Setup basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def fetch_cves_for_service(service, version, api_key=None, rate_limit=1):
+def fetch_cves_for_service(service, version, api_key=None, rate_limit=0.6):
     rate_limit = 0.6 if api_key else 6  # Adjusted based on NVD's rate limits
     headers = {"X-Api-Key": api_key} if api_key else {}
     url = f"https://services.nvd.nist.gov/rest/json/cves/1.0?keyword={service} {version}"
@@ -64,25 +64,24 @@ def fetch_cve_details(cve_id, api_key=None):
         logging.error(f"Failed to fetch details for {cve_id} - {e}")
         return {}
         
-def generate_cve_mappings(xml_files, api_key=None, rate_limit=1):
+def generate_cve_mappings(xml_files, api_key=None, rate_limit=0.6):
     cve_mappings = {}
     for xml_file in xml_files:
         try:
-            tree = ET.parse(xml_file)
-            root = tree.getroot()
-            for host in root.findall('host'):
-                for port in host.findall('ports/port'):
-                    service = port.find('service').get('name') if port.find('service') is not None else 'unknown'
-                    version = port.find('service').get('version') if port.find('service') is not None else 'unknown'
-                    key = f"{service}:{version}"
-                    if key not in cve_mappings and service != 'unknown' and version != 'unknown':
-                        cve_mappings[key] = fetch_cves_for_service(service, version, api_key, rate_limit)
-        except ET.ParseError as e:
-            logging.error(f"Error parsing XML file {xml_file}: {e}")
+            # Assuming hosts_data is already populated by parse_nmap_xml
+            hosts_data = parse_nmap_xml([xml_file])
+            for ip_address, host_data in hosts_data.items():
+                for port_id, port_data in host_data['ports'].items():
+                    service_version_key = f"{port_data['service']}:{port_data['version']}"
+                    if service_version_key not in cve_mappings:
+                        cves = fetch_cves_for_service(port_data['service'], port_data['version'], api_key, rate_limit)
+                        if cves:  # Only add entry if CVEs were found
+                            cve_mappings[service_version_key] = cves
         except Exception as e:
-            logging.error(f"Unexpected error processing file {xml_file}: {e}")
-    return cve_mappings
+            logging.error(f"Error generating CVE mappings from {xml_file}: {e}")
 
+    return cve_mappings
+    
 def get_xml_files_from_directory(directory_path):
     return [os.path.join(directory_path, f) for f in os.listdir(directory_path) if f.endswith('.xml')]
 
@@ -92,29 +91,31 @@ def parse_nmap_xml(xml_files):
         try:
             tree = ET.parse(xml_file)
             root = tree.getroot()
-            for host in root.findall('./host'):
-                # Check if the host is up
-                if host.find("./status").get("state") == "up":
-                    ip_address = host.find("./address[@addrtype='ipv4']").get("addr")
-                    hostnames_element = host.find('hostnames')
-                    hostname = hostnames_element.find('hostname').get('name') if hostnames_element is not None else ''
-
-                    host_info = {'hostname': hostname, 'ports': {}}
-
-                    for port in host.findall('./ports/port'):
-                        port_id = port.get('portid')
-                        service_element = port.find('service')
-                        service_name = service_element.get('name') if service_element is not None else 'unknown'
-                        service_version = service_element.get('version') if service_element is not None else 'unknown'
-
-                        host_info['ports'][port_id] = {'service': service_name, 'version': service_version}
-
-                    hosts_data[ip_address] = host_info
+            for host in root.findall('host'):
+                ip_address = host.find("address[@addrtype='ipv4']").get("addr")
+                hostname_element = host.find('hostnames/hostname')
+                hostname = hostname_element.get('name') if hostname_element is not None else ''
+                
+                if ip_address not in hosts_data:
+                    hosts_data[ip_address] = {'hostname': hostname, 'ports': {}}
+                else:
+                    # Update hostname if it's not previously captured
+                    if not hosts_data[ip_address]['hostname'] and hostname:
+                        hosts_data[ip_address]['hostname'] = hostname
+                
+                for port in host.findall('ports/port'):
+                    port_id = port.get('portid')
+                    service_element = port.find('service')
+                    service_name = service_element.get('name') if service_element else 'unknown'
+                    service_version = service_element.get('version') if service_element and service_element.get('version') else 'unknown'
+                    
+                    # Update or add new port information
+                    hosts_data[ip_address]['ports'][port_id] = {'service': service_name, 'version': service_version}
         except ET.ParseError as e:
             logging.error(f"XML parsing error in file {xml_file}: {e}")
         except Exception as e:
             logging.error(f"Unexpected error when processing {xml_file}: {e}")
-            
+
     return hosts_data
 
 def download_kev_catalog(csv_url="https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.csv", save_path=None):
@@ -207,7 +208,8 @@ if __name__ == "__main__":
     parser.add_argument("xml_directory", help="Directory containing Nmap XML files.")
     parser.add_argument("output_html", help="Path for the output consolidated HTML report.")
     parser.add_argument("--cve_output_json", help="Path for the output CVE mappings JSON file. Required unless --no_cve is used.", default="")
-    parser.add_argument("-k", "--api_key", help="API key for querying the NVD. Increases rate limit to 50 requests per 30 seconds.", default=None)
+    parser.add_argument("-k", "--api_key", help="API key for querying the NVD. Increases rate limit to 50 requests per 30 seconds (compliant with NVD rate limitations).", default=None)
+    parser.add_argument("-r", "--rate_limit", help="Custom rate limit in seconds for NVD queries the default is 5 per 30 seconds (compliant with NVD rate limitations).", type=float, default=0.6)
     parser.add_argument("--no_cve", action="store_true", help="Disable CVE fetching and mapping.")
     parser.add_argument("--kev_catalog_path", help="Path to the KEV catalog file. If not found, it will be downloaded.", default="kev_catalog.csv")
     parser.add_argument("--no_kev", action="store_true", help="Disable KEV information inclusion.")
