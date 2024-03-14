@@ -10,22 +10,22 @@ finishsynscan () {
   echo "results will be stored in $workspace/.scanning/nmap/..."
   echo "running first syn/udp scan of the remaining 64535 ports 'sudo nmap -sSV -p1000-65535  -Pn -r -O'"
   if [ -z "$1" ]; then 
-  sudo nmap -sSV -p1000-65535  -Pn -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/finishsynscan_64k-.targets-1-$(date +%F)`date | sed 's/ /./g'`"
+  sudo nmap -sSV -p1000-65535  -Pn -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/finishsynscan_64k-.targets-1-$(date +%F)"
   else 
     if [ -z "$2" ]; then 
-    sudo nmap -sSV -p1000-65535  -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/finishsynscan_64k-$1-1-$(date +%F)`date | sed 's/ /./g'`"
+    sudo nmap -sSV -p1000-65535  -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/finishsynscan_64k-$1-1-$(date +%F)"
     else 
-    sudo nmap -sSV -p1000-65535  -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/finishsynscan_64k-$2-1-$(date +%F)`date | sed 's/ /./g'`"
+    sudo nmap -sSV -p1000-65535  -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/finishsynscan_64k-$2-1-$(date +%F)"
     fi
   fi
   echo "running second syn/udp scan of the remaining 64535 ports 'sudo nmap -sSV -p1000-65535  -Pn -r -O'"
   if [ -z "$1" ]; then 
-  sudo nmap -sSV -p1000-65535 -Pn -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/finishsynscan_64k-.targets-2-$(date +%F)`date | sed 's/ /./g'`"
+  sudo nmap -sSV -p1000-65535 -Pn -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/finishsynscan_64k-.targets-2-$(date +%F)"
   else 
     if [ -z "$2" ]; then 
-    sudo nmap -sSV -p1000-65535  -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/finishsynscan_64k-$1-2-$(date +%F)`date | sed 's/ /./g'`"
+    sudo nmap -sSV -p1000-65535  -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/finishsynscan_64k-$1-2-$(date +%F)"
     else 
-    sudo nmap -sSV -p1000-65535  -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/finishsynscan_64k-$2-2-$(date +%F)`date | sed 's/ /./g'`"
+    sudo nmap -sSV -p1000-65535  -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/finishsynscan_64k-$2-2-$(date +%F)"
     fi
   fi
   echo "syn/udp scans complete"

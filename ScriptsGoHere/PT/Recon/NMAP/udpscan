@@ -10,22 +10,22 @@ udpscan () {
   echo "results will be stored in $workspace/.scanning/nmap/..."
   echo "running first udp scan 'sudo nmap -sUV -Pn -r -O'"
   if [ -z "$1" ]; then 
-  sudo nmap -sUV -Pn -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/udpscan-.targets-1-$(date +%F)`date | sed 's/ /./g'`"
+  sudo nmap -sUV -Pn -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/udpscan-.targets-1-$(date +%F)"
   else 
     if [ -z "$2" ]; then 
-    sudo nmap -sUV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/udpscan-$1-1-$(date +%F)`date | sed 's/ /./g'`"
+    sudo nmap -sUV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/udpscan-$1-1-$(date +%F)"
     else 
-    sudo nmap -sUV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/udpscan-$2-1-$(date +%F)`date | sed 's/ /./g'`"
+    sudo nmap -sUV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/udpscan-$2-1-$(date +%F)"
     fi
   fi
   echo "running second udp scan 'sudo nmap -sUV -Pn -r -O'"
   if [ -z "$1" ]; then 
-  sudo nmap -sUV -Pn -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/udpscan-.targets-2-$(date +%F)`date | sed 's/ /./g'`"
+  sudo nmap -sUV -Pn -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/udpscan-.targets-2-$(date +%F)"
   else 
     if [ -z "$2" ]; then 
-    sudo nmap -sUV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/udpscan-$1-2-$(date +%F)`date | sed 's/ /./g'`"
+    sudo nmap -sUV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/udpscan-$1-2-$(date +%F)"
     else 
-    sudo nmap -sUV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/udpscan-$2-2-$(date +%F)`date | sed 's/ /./g'`"
+    sudo nmap -sUV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/udpscan-$2-2-$(date +%F)"
     fi
   fi
   echo "udp scans complete"
