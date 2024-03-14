@@ -64,22 +64,26 @@ def fetch_cve_details(cve_id, api_key=None):
         logging.error(f"Failed to fetch details for {cve_id} - {e}")
         return {}
         
-def generate_cve_mappings(xml_files, api_key=None, rate_limit=0.6):
+def generate_cve_mappings(xml_files, api_key=None, rate_limit=1):
     cve_mappings = {}
     for xml_file in xml_files:
         try:
-            # Assuming hosts_data is already populated by parse_nmap_xml
-            hosts_data = parse_nmap_xml([xml_file])
+            hosts_data = parse_nmap_xml([xml_file])  # Ensure this function is correctly implemented
             for ip_address, host_data in hosts_data.items():
                 for port_id, port_data in host_data['ports'].items():
-                    service_version_key = f"{port_data['service']}:{port_data['version']}"
+                    service = port_data['service']
+                    version = port_data['version']
+                    # Skip fetching for unknown services or versions
+                    if service == 'unknown' or version == 'unknown':
+                        logging.info(f"Skipping CVE fetch for unknown service/version: {service}:{version}")
+                        continue
+                    service_version_key = f"{service}:{version}"
                     if service_version_key not in cve_mappings:
-                        cves = fetch_cves_for_service(port_data['service'], port_data['version'], api_key, rate_limit)
+                        cves = fetch_cves_for_service(service, version, api_key, rate_limit)
                         if cves:  # Only add entry if CVEs were found
                             cve_mappings[service_version_key] = cves
         except Exception as e:
             logging.error(f"Error generating CVE mappings from {xml_file}: {e}")
-
     return cve_mappings
     
 def get_xml_files_from_directory(directory_path):
@@ -118,7 +122,7 @@ def parse_nmap_xml(xml_files):
 
     return hosts_data
 
-def download_kev_catalog(csv_url="https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.csv", save_path=None):
+def download_kev_catalog(csv_url="https://www.cisa.gov/sites/default/files/csv/known_exploited_vulnerabilities.csv", save_path=None):
     response = requests.get(csv_url)
     response.raise_for_status()  # Ensure the request was successful
     if save_path:
