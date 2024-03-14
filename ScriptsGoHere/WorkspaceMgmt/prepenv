@@ -8,5 +8,6 @@ echo " + export projectname=\"\$(<.conf/.projectname)\""
 echo " + chkenv\n"
   export workspace="$(<.conf/.workspace)"
   export projectname="$(<.conf/.projectname)"
+  export targets="$(<.conf/.targets)"
   chkenv
 };

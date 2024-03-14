@@ -9,4 +9,6 @@ chkenv () {
   echo "\$projectname  = \"$projectname\""
   echo "\$scriptlog    = \"$scriptlog\""
   echo "\$return_dir   = \"$return_dir\""
+  echo "\$script_dir   = \"$script_dir\""
+  echo "\$targets      = \"$targets\""
 };

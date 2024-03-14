@@ -1,0 +1,15 @@
+#!/bin/zsh
+# this script consolidates nmap scan results from 
+# to use call "consolidate_scans <output filename>"
+# this script sources input from the default output directory for nmap scans $workspace/.scanning/nmap/ 
+# writes results to $workspace/.scanning/nmap/consolidated_results/...
+consolidate_scans () {
+  if [ ! -d "$workspace/.scanning/nmap/consolidated_results/" ]; then
+    mkdir $workspace/.scanning/nmap/consolidated_results/
+  fi
+
+  echo "results will be stored in $workspace/.scanning/nmap/consolidated_results/"
+  python $script_dir/PT/Recon/NMAP/formatting/consolidate_scans.py $workspace/.scanning/nmap/ $workspace/.scanning/nmap/consolidated_results/$1
+  echo "Consolidation complete"
+  echo ""
+};

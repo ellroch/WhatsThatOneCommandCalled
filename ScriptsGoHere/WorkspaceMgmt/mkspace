@@ -11,6 +11,7 @@ echo " + echo \"pwd: \$(pwd)\"\n"
   mkdir -pv $1/{.conf,.recon,.scanning,.exploitation,.post_exploitation,report/{overview_of_findings,known_vulns,suspected_vulns,known_machines,known_services}}
   echo "$(pwd)/$1" > $1/.conf/.workspace
   echo $1 > $1/.conf/.projectname
+  touch $1/.conf/.targets
   cd $1
   prepenv
   echo "pwd: $(pwd)"
