@@ -9,7 +9,7 @@ consolidate_scans () {
   fi
 
   echo "results will be stored in $workspace/.scanning/nmap/consolidated_results/"
-  python $script_dir/PT/Recon/NMAP/formatting/consolidate_scans.py $workspace/.scanning/nmap/ $workspace/.scanning/nmap/consolidated_results/$1
+  python $script_dir/PT/Recon/NMAP/formatting/consolidate_scans.py $workspace/.scanning/nmap/ $workspace/.scanning/nmap/consolidated_results/$1 $workspace/.scanning/nmap/consolidated_results/CVEs.json
   echo "Consolidation complete"
   echo ""
 };

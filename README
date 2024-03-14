@@ -29,7 +29,11 @@ fi
     export script_dir="/home/kali/.myfunctions/ScriptsGoHere/"
 #=======================================================================================
 # $targets
+if [ -f ".conf/.targets" ]; then
     export targets="$(<.conf/.targets)"
+else 
+    export targets=""
+fi
 #=======================================================================================
   
 # autoload the custom functions
