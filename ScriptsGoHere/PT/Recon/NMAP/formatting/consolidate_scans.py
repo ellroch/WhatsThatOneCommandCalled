@@ -28,43 +28,101 @@ import requests
 import time
 import csv
 import logging
+import urllib.parse
+from urllib.parse import quote
+
+DEFAULT_RATE_LIMIT_WITH_KEY = 0.6  # 50 requests in 30 seconds
+DEFAULT_RATE_LIMIT_WITHOUT_KEY = 6  # 5 requests in 30 seconds
 
 # Setup basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def fetch_cves_for_service(service, version, api_key=None, rate_limit=0.6):
-    rate_limit = 0.6 if api_key else 6  # Adjusted based on NVD's rate limits
+def generate_nvd_search_url(service, version):
+    keywords = f"{service} {version}"
+    encoded_keywords = quote_plus(keywords)
+    return f"https://nvd.nist.gov/vuln/search/results?form_type=Basic&results_type=overview&query={encoded_keywords}&search_type=all"
+
+def fetch_cves_for_service(service, version, api_key=None):
+    keywords = " ".join([service, version])
+    encoded_keywords = quote(keywords)
+    url = f"https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch={encoded_keywords}"
     headers = {"X-Api-Key": api_key} if api_key else {}
-    url = f"https://services.nvd.nist.gov/rest/json/cves/1.0?keyword={service} {version}"
+    
     try:
         response = requests.get(url, headers=headers)
-        response.raise_for_status()  # Check for HTTP request errors
-        cve_items = response.json().get('result', {}).get('CVE_Items', [])
-        cves = [item['cve']['CVE_data_meta']['ID'] for item in cve_items]
-        time.sleep(rate_limit)  # Respect the rate limit
+        response.raise_for_status()  # Ensure successful response
+        data = response.json()
+        
+        cves = []
+        if 'vulnerabilities' in data:
+            for vuln in data['vulnerabilities']:
+                cve_id = vuln['cve']['CVE_data_meta']['ID']
+                cvss_v2 = vuln.get('metrics', {}).get('cvssMetricV2', [{}])[0].get('cvssData', {}).get('baseScore', 'N/A')
+                cvss_v3 = vuln.get('metrics', {}).get('cvssMetricV3', [{}])[0].get('cvssData', {}).get('baseScore', 'N/A')
+                references = [ref['url'] for ref in vuln.get('references', [])]
+                
+                cves.append({
+                    'cve_id': cve_id,
+                    'cvss_v2': cvss_v2,
+                    'cvss_v3': cvss_v3,
+                    'references': references
+                })
+                
         return cves
-    except requests.exceptions.RequestException as e:
-        logging.error(f"Failed to fetch CVEs for {service}:{version} - {e}")
-        return []
+    except Exception as e:
+        print(f"Error fetching CVE data for {service} {version}: {e}")
+        print(f"Attempting to fetch CVE data for {service} alone")
+        keywords = " ".join([service])
+        encoded_keywords = quote(keywords)
+        url = f"https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch={encoded_keywords}"
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()  # Ensure successful response
+            data = response.json()
+        
+            cves = []
+            if 'vulnerabilities' in data:
+                for vuln in data['vulnerabilities']:
+                    cve_id = vuln['cve']['CVE_data_meta']['ID']
+                    cvss_v2 = vuln.get('metrics', {}).get('cvssMetricV2', [{}])[0].get('cvssData', {}).get('baseScore', 'N/A')
+                    cvss_v3 = vuln.get('metrics', {}).get('cvssMetricV3', [{}])[0].get('cvssData', {}).get('baseScore', 'N/A')
+                    references = [ref['url'] for ref in vuln.get('references', [])]
+                
+                    cves.append({
+                        'cve_id': cve_id,
+                        'cvss_v2': cvss_v2,
+                        'cvss_v3': cvss_v3,
+                        'references': references
+                    })
+                
+            return cves
+        except Exception as e:
+            print(f"Error fetching CVE data for {service} alone: {e}")
+            return []
+
 
 def fetch_cve_details(cve_id, api_key=None):
     headers = {"X-Api-Key": api_key} if api_key else {}
-    url = f"https://services.nvd.nist.gov/rest/json/cve/1.0/{cve_id}"
+    # Updated to use the 2.0 endpoint and direct CVE ID querying
+    url = f"https://services.nvd.nist.gov/rest/json/cves/2.0?cveId={cve_id}"
     try:
         response = requests.get(url, headers=headers)
         response.raise_for_status()
+        # Parsing the response to extract the relevant information
         cve_data = response.json().get('result', {}).get('CVE_Items', [])[0]
+        cvss_v3 = cve_data.get('impact', {}).get('baseMetricV3', {}).get('cvssV3', {})
+        cvss_v2 = cve_data.get('impact', {}).get('baseMetricV2', {})
+        
         return {
-            'cvss_v3_severity': cve_data['impact'].get('baseMetricV3', {}).get('cvssV3', {}).get('baseSeverity', 'N/A'),
-            'cvss_v2_severity': cve_data['impact'].get('baseMetricV2', {}).get('severity', 'N/A'),
-            'cwe_id': cve_data['cve']['problemtype']['problemtype_data'][0]['description'][0]['value'] if cve_data['cve']['problemtype']['problemtype_data'] else "N/A",
-            # Include additional KEV list details as needed
+            'cvss_v3_severity': cvss_v3.get('baseSeverity', 'N/A'),
+            'cvss_v2_severity': cvss_v2.get('severity', 'N/A'),
+            'cwe_id': cve_data.get('cve', {}).get('problemtype', {}).get('problemtype_data', [{}])[0].get('description', [{}])[0].get('value', 'N/A'),
         }
     except requests.exceptions.RequestException as e:
         logging.error(f"Failed to fetch details for {cve_id} - {e}")
-        return {}
+        return None
         
-def generate_cve_mappings(xml_files, api_key=None, rate_limit=1):
+def generate_cve_mappings(xml_files, api_key=None):
     cve_mappings = {}
     for xml_file in xml_files:
         try:
@@ -75,11 +133,11 @@ def generate_cve_mappings(xml_files, api_key=None, rate_limit=1):
                     version = port_data['version']
                     # Skip fetching for unknown services or versions
                     if service == 'unknown' or version == 'unknown':
-                        logging.info(f"Skipping CVE fetch for unknown service/version: {service}:{version}")
+                        #logging.info(f"Skipping CVE fetch for unknown service/version: {service}:{version}")
                         continue
                     service_version_key = f"{service}:{version}"
                     if service_version_key not in cve_mappings:
-                        cves = fetch_cves_for_service(service, version, api_key, rate_limit)
+                        cves = fetch_cves_for_service(service, version, api_key)
                         if cves:  # Only add entry if CVEs were found
                             cve_mappings[service_version_key] = cves
         except Exception as e:
@@ -96,31 +154,40 @@ def parse_nmap_xml(xml_files):
             tree = ET.parse(xml_file)
             root = tree.getroot()
             for host in root.findall('host'):
-                ip_address = host.find("address[@addrtype='ipv4']").get("addr")
-                hostname_element = host.find('hostnames/hostname')
-                hostname = hostname_element.get('name') if hostname_element is not None else ''
-                
-                if ip_address not in hosts_data:
-                    hosts_data[ip_address] = {'hostname': hostname, 'ports': {}}
-                else:
-                    # Update hostname if it's not previously captured
-                    if not hosts_data[ip_address]['hostname'] and hostname:
-                        hosts_data[ip_address]['hostname'] = hostname
-                
+                # Initialize a dictionary to hold host information
+                host_info = {'addresses': [], 'hostnames': [], 'ports': {}}
+
+                # Collect all addresses (IPv4, IPv6)
+                for addr in host.findall("address"):
+                    if addr.get("addrtype") in ["ipv4", "ipv6"]:
+                        host_info['addresses'].append(addr.get("addr"))
+
+                # Collect all hostnames
+                for hostname in host.findall('hostnames/hostname'):
+                    host_info['hostnames'].append(hostname.get('name'))
+
+                # Process port information
                 for port in host.findall('ports/port'):
                     port_id = port.get('portid')
                     service_element = port.find('service')
-                    service_name = service_element.get('name') if service_element else 'unknown'
-                    service_version = service_element.get('version') if service_element and service_element.get('version') else 'unknown'
+                    service_name = service_element.get('name') if service_element is not None else 'unknown'
+                    service_version = service_element.get('product') if service_element is not None and service_element.get('product') is not None else 'unknown'
                     
-                    # Update or add new port information
-                    hosts_data[ip_address]['ports'][port_id] = {'service': service_name, 'version': service_version}
+                    # Update port information
+                    host_info['ports'][port_id] = {'service': service_name, 'version': service_version}
+
+                # Use the first address or hostname as the primary identifier, favoring addresses
+                primary_identifier = host_info['addresses'][0] if host_info['addresses'] else (host_info['hostnames'][0] if host_info['hostnames'] else None)
+                if primary_identifier:
+                    hosts_data[primary_identifier] = host_info
         except ET.ParseError as e:
             logging.error(f"XML parsing error in file {xml_file}: {e}")
         except Exception as e:
             logging.error(f"Unexpected error when processing {xml_file}: {e}")
 
     return hosts_data
+
+
 
 def download_kev_catalog(csv_url="https://www.cisa.gov/sites/default/files/csv/known_exploited_vulnerabilities.csv", save_path=None):
     response = requests.get(csv_url)
@@ -129,15 +196,6 @@ def download_kev_catalog(csv_url="https://www.cisa.gov/sites/default/files/csv/k
         with open(save_path, 'w', newline='', encoding='utf-8') as f:
             f.write(response.text)
     return csv.DictReader(response.text.splitlines())
-
-def load_or_fetch_kev_catalog(kev_catalog_path):
-    if os.path.exists(kev_catalog_path):
-        with open(kev_catalog_path, 'r', newline='', encoding='utf-8') as f:
-            return list(csv.DictReader(f))
-    else:
-        print("KEV catalog not found, downloading...")
-        kev_entries = download_kev_catalog(save_path=kev_catalog_path)
-        return list(kev_entries)
 
 def load_or_fetch_kev_catalog(kev_catalog_path):
     if os.path.exists(kev_catalog_path):
@@ -153,59 +211,116 @@ def load_or_fetch_kev_catalog(kev_catalog_path):
     except Exception as e:
         logging.error(f"Failed to download KEV catalog - {e}")
         return []
-
-def cvss_severity_to_color(severity):
-    """Convert CVSS severity to a color for HTML display."""
-    return {
-        'CRITICAL': 'red',
-        'HIGH': 'darkorange',
-        'MEDIUM': 'yellow',
-        'LOW': 'lightgreen',
-        'NONE': 'white',  # Default if severity is undefined or 'N/A'
-    }.get(severity, 'white')
-
-def generate_html_report(hosts_data, cve_mappings, output_html, kev_data=None):
-    kev_dict = {item['cve_id']: item for item in kev_data} if kev_data else {}
-
-    with open(output_html, 'w') as f:
-        f.write("<html><head><title>Nmap Scan Report</title><style>")
-        f.write("table {border-collapse: collapse;} th, td {border: 1px solid black; padding: 8px;} ")
-        f.write(".critical {background-color: red;} .high {background-color: darkorange;} ")
-        f.write(".medium {background-color: yellow;} .low {background-color: lightgreen;} ")
-        f.write("</style></head><body>")
-        f.write("<h1>Nmap Scan Results</h1>")
         
-        for host, data in hosts_data.items():
-            f.write(f"<h2>{host} - {data.get('hostname', '')}</h2>")
-            f.write("<table><tr><th>Port</th><th>Service</th><th>Version</th><th>CVSS v3</th><th>CVSS v2</th><th>CWE ID</th><th>CVEs</th><th>KEV Info</th></tr>")
+def transform_kev_data(kev_list):
+    kev_dict = {}
+    for entry in kev_list:
+        cve_id = entry.get('cve_id')  # Adjust 'cve_id' based on your KEV catalog's column name for CVE IDs
+        if cve_id:
+            kev_dict[cve_id] = entry  # Stores the entire row as the value
+    return kev_dict
+
+
+def get_severity_class(cvss_score):
+    """Returns a CSS class based on CVSS score."""
+    if cvss_score >= 9.0:
+        return "critical"
+    elif cvss_score >= 7.0:
+        return "high"
+    elif cvss_score >= 4.0:
+        return "medium"
+    else:
+        return "low"
+        
+def generate_html_report(hosts_data, cve_mappings, output_html, api_key=None, kev_data=None):
+    with open(output_html, 'w') as f:
+        # Include the refined stylesheet and JavaScript function at the beginning of the HTML document
+        f.write("""
+        <html>
+        <head>
+            <title>Nmap Scan Report</title>
+            <style>
+                body { font-family: Arial, sans-serif; font-size: 14px; margin: 20px; }
+                .container { margin-bottom: 20px; }
+                .toggle { padding: 10px; margin-bottom: 5px; background-color: #f0f0f0; border-radius: 5px; cursor: pointer; border: 1px solid #ccc; }
+                .toggle:hover { background-color: #e9e9e9; }
+                .content { display: none; padding: 10px; border: 1px solid #ccc; border-top: none; border-radius: 0 0 5px 5px; background-color: #f9f9f9; }
+                .critical { border-color: #ff0000; }
+                .high { border-color: #ff8c00; }
+                .medium { border-color: #ffd700; }
+                .low { border-color: #9acd32; }
+                .unknown { border-color: #d3d3d3; }
+            </style>
+            <script>
+                function toggleVisibility(id) {
+                    var elements = document.getElementsByClassName(id);
+                    for (var i = 0; i < elements.length; i++) {
+                        elements[i].style.display = elements[i].style.display === 'none' ? 'block' : 'none';
+                    }
+                }
+            </script>
+        </head>
+        <body>
+        <h1>Nmap Scan Report</h1>
+        """)
             
-            for port, port_data in data['ports'].items():
-                service = port_data['service']
-                version = port_data.get('version', 'N/A')
-                service_version_key = f"{service}:{version}"
-                cves = cve_mappings.get(service_version_key, [])
+        for host_id, host_info in hosts_data.items():
+            # Mock
+            logging.info(f"Processing host: {host_id}")
+            # Display host information
+            addresses = ', '.join(host_info['addresses'])
+            hostnames = ', '.join(host_info['hostnames'])
+            f.write(f'<div class="toggle" onclick="toggleVisibility(\'{host_id}\')"><strong>{host_id}</strong> - Hostnames: {hostnames}</div>\n')
+            f.write(f'<div class="content {host_id}" style="display:none;">\n')
+
+
+            # Iterate over services
+            for port_id, port_info in host_info['ports'].items():
+                # Mock
+                logging.info(f"Service: {port_info['service']}, Version: {port_info.get('version', 'unknown')}")
+                # Here, service_cves will be a list of CVE IDs, and fallback_url is provided if direct CVE info is unavailable
+                service_key = f"{port_info['service']}:{port_info.get('version', None)}"
+                if service_key in cve_mappings:
+                    logging.info(f"CVE data found for {service_key}")
+                else:
+                    logging.info(f"No CVE data found for {service_key}")
+                service_cves = cve_mappings.get(service_key, [])
                 
-                # Determine the highest CVSS severity for color-coding
-                max_severity = "NONE"
-                for cve in cves:
-                    cve_details = fetch_cve_details(cve)
-                    severity_v3 = cve_details['cvss_v3_severity']
-                    if severity_v3 and severity_v3 != "N/A":
-                        max_severity = max(max_severity, severity_v3, key=lambda s: cvss_severity_to_color(s))
+                highest_cvss = 0
+                for cve_id in service_cves:
+                    cve_info = fetch_cve_details(cve_id, api_key)
+                    if cve_info:
+                        cvss_v3_score = float(cve_info.get('cvss_v3_severity', 0))
+                        highest_cvss = max(highest_cvss, cvss_v3_score)
+
+                severity_class = get_severity_class(highest_cvss)
+                f.write(f'<div class="toggle {severity_class}" onclick="toggleVisibility(\'service{port_id}\')">Port: {port_id}, Service: {port_info["service"]}, Version: {port_info.get("version", "unknown")}</div>\n')
+                f.write(f'<div id="service{port_id}" class="content service{port_id}" style="display:none;">\n')
+
+                if not service_cves:  # Handle fallback URL logic here
+                    search_query = urllib.parse.quote(f"{port_info['service']}".replace('unknown', '').strip())
+                    fallback_url = f"https://nvd.nist.gov/vuln/search/results?form_type=Basic&results_type=overview&query={search_query}&search_type=all"
+                    f.write(f'<p>No direct CVE information available. <a href="{fallback_url}" target="_blank">Search NVD for more details.</a></p>\n')
+                else:
+                    for cve_id in service_cves:
+                        cve_info = fetch_cve_details(cve_id, api_key)
+                        if cve_info:
+                            cve_link = f'https://nvd.nist.gov/vuln/detail/{cve_id}'
+                            exploitdb_link = f'https://www.exploit-db.com/search?cve={cve_id}'
+                            f.write(f'<p>CVE: <a href="{cve_link}" target="_blank">{cve_id}</a>, CVSS v3: {cve_info.get("cvss_v3_severity", "N/A")}, CVSS v2: {cve_info.get("cvss_v2_severity", "N/A")}, CWE: {cve_info.get("cwe_id", "N/A")}<br>ExploitDB: <a href="{exploitdb_link}" target="_blank">Link</a></p>\n')
                 
-                row_color_class = cvss_severity_to_color(max_severity).lower()
-                f.write(f"<tr class='{row_color_class}'><td>{port}</td><td>{service}</td><td>{version}</td>")
-                
-                for cve in cves:
-                    cve_details = fetch_cve_details(cve)
-                    kev_info = kev_dict.get(cve)
-                    kev_status = "Yes" if kev_info else "No"
-                    f.write(f"<td>{cve_details['cvss_v3_severity']}</td><td>{cve_details['cvss_v2_severity']}</td><td>{cve_details['cwe_id']}</td>")
-                    f.write(f"<td><a href='https://nvd.nist.gov/vuln/detail/{cve}'>{cve}</a></td>")
-                    f.write(f"<td>{kev_status}</td></tr>")
-            
-            f.write("</table>")
-        f.write("</body></html>")
+                # Include KEV information if available
+                        if cve_id in kev_data:
+                            kev_info = kev_data[cve_id]
+                            f.write(f"<p>KEV Info: Vulnerability Name: {kev_info.get('Vulnerability Name', 'N/A')}, "
+                                    f"Date Added: {kev_info.get('Date Added', 'N/A')}, "
+                                    f"Due Date: {kev_info.get('Due Date', 'N/A')}, "
+                                    f"Required Action: {kev_info.get('Required Action', 'N/A')}</p>\n")
+
+                f.write('</div>\n')  # Close service details div
+            f.write('</div>\n')  # Close host details div
+
+        f.write('</body></html>')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate a consolidated HTML report from Nmap XML files, optionally including CVE information and CISA's KEV catalog details.")
@@ -213,7 +328,6 @@ if __name__ == "__main__":
     parser.add_argument("output_html", help="Path for the output consolidated HTML report.")
     parser.add_argument("--cve_output_json", help="Path for the output CVE mappings JSON file. Required unless --no_cve is used.", default="")
     parser.add_argument("-k", "--api_key", help="API key for querying the NVD. Increases rate limit to 50 requests per 30 seconds (compliant with NVD rate limitations).", default=None)
-    parser.add_argument("-r", "--rate_limit", help="Custom rate limit in seconds for NVD queries the default is 5 per 30 seconds (compliant with NVD rate limitations).", type=float, default=0.6)
     parser.add_argument("--no_cve", action="store_true", help="Disable CVE fetching and mapping.")
     parser.add_argument("--kev_catalog_path", help="Path to the KEV catalog file. If not found, it will be downloaded.", default="kev_catalog.csv")
     parser.add_argument("--no_kev", action="store_true", help="Disable KEV information inclusion.")
@@ -227,9 +341,9 @@ if __name__ == "__main__":
             exit()
 
         hosts_data = parse_nmap_xml(xml_files)
-
+        
         if not args.no_cve:
-            cve_mappings = generate_cve_mappings(xml_files, args.api_key, args.rate_limit)
+            cve_mappings = generate_cve_mappings(xml_files, args.api_key)
             with open(args.cve_output_json, 'w') as f:
                 json.dump(cve_mappings, f, indent=4)
             logging.info(f"CVE mappings saved to {args.cve_output_json}")
@@ -237,8 +351,25 @@ if __name__ == "__main__":
         kev_data = None
         if not args.no_kev:
             kev_data = load_or_fetch_kev_catalog(args.kev_catalog_path)
-
-        generate_html_report(hosts_data, cve_mappings if not args.no_cve else None, args.output_html, kev_data)
+            kev_data = transform_kev_data(kev_data)
+"""
+        #################################### Mock Start
+        cve_mappings = {'http:Apache httpd:2.4.29': ['CVE-2017-9798', 'CVE-2021-41773']}
+        kev_data = {
+            'CVE-2021-41773': {
+                'Vulnerability Name': 'Path Traversal in Apache HTTP Server 2.4.49',
+                'Date Added': '2021-10-05',
+                'Due Date': '2021-11-02',
+                'Required Action': 'Apply Patch'
+            }
+        }
+        
+        # Assuming you have variables cve_mappings and kev_data filled with mock data
+        logging.info(f"Mock CVE mappings: {cve_mappings}")
+        logging.info(f"Mock KEV data: {kev_data}")
+        #################################### Mock End
+"""
+        generate_html_report(hosts_data, cve_mappings if not args.no_cve else None, args.output_html,args.api_key, kev_data)
         logging.info(f"HTML report generated: {args.output_html}")
     except Exception as e:
         logging.error(f"An unexpected error occurred: {e}")
