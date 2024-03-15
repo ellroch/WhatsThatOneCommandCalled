@@ -274,9 +274,6 @@ def generate_html_report(hosts_data, cve_mappings, output_html, api_key=None, ke
             f.write(f'<div class="toggle" onclick="toggleVisibility(\'{host_id}\')"><strong>{host_id}</strong> - Hostnames: {hostnames}</div>\n')
             f.write(f'<div class="content {host_id}" style="display:none;">\n')
             
-            # Insert header element at the top of each dropdown
-            f.write('<div class="header">Port - Service - Version</div>\n')
-            
             # Iterate over services
             for port_id, port_info in host_info['ports'].items():
                 # Mock
@@ -297,7 +294,7 @@ def generate_html_report(hosts_data, cve_mappings, output_html, api_key=None, ke
                         highest_cvss = max(highest_cvss, cvss_v3_score)
 
                 severity_class = get_severity_class(highest_cvss)
-                f.write(f'<div class="toggle {severity_class}" onclick="toggleVisibility(\'service{port_id}\')">Port: {port_id}, Service: {port_info["service"]}, Version: {port_info.get("version", "unknown")}</div>\n')
+                f.write(f'<div class="toggle {severity_class}" onclick="toggleVisibility(\'service{port_id}\')">Port: {port_id}, Service: {port_info["service"]}, Version: {port_info.get("version", "N/A")}</div>\n')
                 f.write(f'<div id="service{port_id}" class="content service{port_id}" style="display:none;">\n')
 
                 if not service_cves:  # Handle fallback URL logic here
