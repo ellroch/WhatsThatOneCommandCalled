@@ -250,6 +250,7 @@ def generate_html_report(hosts_data, cve_mappings, output_html, api_key=None, ke
                 .medium { border-color: #ffd700; }
                 .low { border-color: #9acd32; }
                 .unknown { border-color: #d3d3d3; }
+                .header { font-weight: bold; margin-bottom: 10px; }
             </style>
             <script>
                 function toggleVisibility(id) {
@@ -272,8 +273,10 @@ def generate_html_report(hosts_data, cve_mappings, output_html, api_key=None, ke
             hostnames = ', '.join(host_info['hostnames'])
             f.write(f'<div class="toggle" onclick="toggleVisibility(\'{host_id}\')"><strong>{host_id}</strong> - Hostnames: {hostnames}</div>\n')
             f.write(f'<div class="content {host_id}" style="display:none;">\n')
-
-
+            
+            # Insert header element at the top of each dropdown
+            f.write('<div class="header">Port - Service - Version</div>\n')
+            
             # Iterate over services
             for port_id, port_info in host_info['ports'].items():
                 # Mock
@@ -352,23 +355,23 @@ if __name__ == "__main__":
         if not args.no_kev:
             kev_data = load_or_fetch_kev_catalog(args.kev_catalog_path)
             kev_data = transform_kev_data(kev_data)
-"""
+
         #################################### Mock Start
-        cve_mappings = {'http:Apache httpd:2.4.29': ['CVE-2017-9798', 'CVE-2021-41773']}
-        kev_data = {
-            'CVE-2021-41773': {
-                'Vulnerability Name': 'Path Traversal in Apache HTTP Server 2.4.49',
-                'Date Added': '2021-10-05',
-                'Due Date': '2021-11-02',
-                'Required Action': 'Apply Patch'
-            }
-        }
+        #cve_mappings = {'http:Apache httpd:2.4.29': ['CVE-2017-9798', 'CVE-2021-41773']}
+        #kev_data = {
+        #    'CVE-2021-41773': {
+        #        'Vulnerability Name': 'Path Traversal in Apache HTTP Server 2.4.49',
+        #        'Date Added': '2021-10-05',
+        #        'Due Date': '2021-11-02',
+        #        'Required Action': 'Apply Patch'
+        #    }
+        #}
         
         # Assuming you have variables cve_mappings and kev_data filled with mock data
-        logging.info(f"Mock CVE mappings: {cve_mappings}")
-        logging.info(f"Mock KEV data: {kev_data}")
+        #logging.info(f"Mock CVE mappings: {cve_mappings}")
+        #logging.info(f"Mock KEV data: {kev_data}")
         #################################### Mock End
-"""
+
         generate_html_report(hosts_data, cve_mappings if not args.no_cve else None, args.output_html,args.api_key, kev_data)
         logging.info(f"HTML report generated: {args.output_html}")
     except Exception as e:
