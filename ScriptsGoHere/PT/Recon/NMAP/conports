@@ -8,26 +8,26 @@ conports () {
   fi
 
   echo "results will be stored in $workspace/.scanning/nmap/..."
-  echo "running first tcp connect scan 'sudo nmap -sTV -Pn -r -O -p$1'"
+  echo "running first tcp connect scan 'sudo nmap -sTV  -r -O -p$1'"
   if [ -z "$1" ]; then 
   echo "!!  This command requires a list of ports as the first argument and optionally an output filename as a second argument"
   echo "!!  Example: 80,443,8080 or 1-1024"
   else 
     if [ -z "$2" ]; then 
-    sudo nmap -sTV -Pn -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/conports-$1-1-$(date +%F)"
+    sudo nmap -sTV  -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/conports-$1-1-$(date +%F)"
     else 
-    sudo nmap -sTV -Pn -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/conports-$2-1-$(date +%F)"
+    sudo nmap -sTV  -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/conports-$2-1-$(date +%F)"
     fi
   fi
-  echo "running second tcp connect scan 'sudo nmap -sTV -Pn -r -O -p$1'"
+  echo "running second tcp connect scan 'sudo nmap -sTV  -r -O -p$1'"
   if [ -z "$1" ]; then 
   echo "!!  This command requires a list of ports as the first argument and optionally an output filename as a second argument"
   echo "!!  Example: 80,443,8080 or 1-1024  "
   else 
     if [ -z "$2" ]; then 
-    sudo nmap -sTV -Pn -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/conports-$1-2-$(date +%F)"
+    sudo nmap -sTV  -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/conports-$1-2-$(date +%F)"
     else 
-    sudo nmap -sTV -Pn -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/conports-$2-2-$(date +%F)"
+    sudo nmap -sTV  -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/conports-$2-2-$(date +%F)"
     fi
   fi
   echo "tcp connect scans complete"
