@@ -8,24 +8,24 @@ quickscan () {
   fi
 
   echo "results will be stored in $workspace/.scanning/nmap/..."
-  echo "running first syn/udp scan 'sudo nmap -sSU -T5 -p-  -r -O'"
+  echo "running first syn/udp scan 'sudo nmap --stylesheet https://raw.githubusercontent.com/honze-net/nmap-bootstrap-xsl/master/nmap-bootstrap.xsl -sSU -T5 -p-  -r -O'"
   if [ -z "$1" ]; then 
-  sudo nmap -sSU -T5 -p- -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/quickscan-.targets-1-$(date +%F)"
+  sudo nmap --stylesheet https://raw.githubusercontent.com/honze-net/nmap-bootstrap-xsl/master/nmap-bootstrap.xsl -sSU -T5 -p- -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/quickscan-.targets-1-$(date +%F)"
   else 
     if [ -z "$2" ]; then 
-    sudo nmap -sSU -T5 -p- -r -O -iL $1 -oA "$workspace/.scanning/nmap/quickscan-$1-1-$(date +%F)"
+    sudo nmap --stylesheet https://raw.githubusercontent.com/honze-net/nmap-bootstrap-xsl/master/nmap-bootstrap.xsl -sSU -T5 -p- -r -O -iL $1 -oA "$workspace/.scanning/nmap/quickscan-$1-1-$(date +%F)"
     else 
-    sudo nmap -sSU -T5 -p- -r -O -iL $1 -oA "$workspace/.scanning/nmap/quickscan-$2-1-$(date +%F)"
+    sudo nmap --stylesheet https://raw.githubusercontent.com/honze-net/nmap-bootstrap-xsl/master/nmap-bootstrap.xsl -sSU -T5 -p- -r -O -iL $1 -oA "$workspace/.scanning/nmap/quickscan-$2-1-$(date +%F)"
     fi
   fi
-  echo "running second syn/udp scan 'sudo nmap -sSU -T5 -p- -r -O'"
+  echo "running second syn/udp scan 'sudo nmap --stylesheet https://raw.githubusercontent.com/honze-net/nmap-bootstrap-xsl/master/nmap-bootstrap.xsl -sSU -T5 -p- -r -O'"
   if [ -z "$1" ]; then 
-  sudo nmap -sSU -T5 -p- -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/quickscan-.targets-2-$(date +%F)"
+  sudo nmap --stylesheet https://raw.githubusercontent.com/honze-net/nmap-bootstrap-xsl/master/nmap-bootstrap.xsl -sSU -T5 -p- -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/quickscan-.targets-2-$(date +%F)"
   else 
     if [ -z "$2" ]; then 
-    sudo nmap -sSU -T5 -p- -r -O -iL $1 -oA "$workspace/.scanning/nmap/quickscan-$1-2-$(date +%F)"
+    sudo nmap --stylesheet https://raw.githubusercontent.com/honze-net/nmap-bootstrap-xsl/master/nmap-bootstrap.xsl -sSU -T5 -p- -r -O -iL $1 -oA "$workspace/.scanning/nmap/quickscan-$1-2-$(date +%F)"
     else 
-    sudo nmap -sSU -T5 -p- -r -O -iL $1 -oA "$workspace/.scanning/nmap/quickscan-$2-2-$(date +%F)"
+    sudo nmap --stylesheet https://raw.githubusercontent.com/honze-net/nmap-bootstrap-xsl/master/nmap-bootstrap.xsl -sSU -T5 -p- -r -O -iL $1 -oA "$workspace/.scanning/nmap/quickscan-$2-2-$(date +%F)"
     fi
   fi
   echo "syn/udp scans complete"

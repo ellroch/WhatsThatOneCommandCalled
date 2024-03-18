@@ -8,26 +8,26 @@ udpports () {
   fi
 
   echo "results will be stored in $workspace/.scanning/nmap/..."
-  echo "running first version scan 'sudo nmap -sSUV -T4   -r -O -p$1'"
+  echo "running first version scan 'sudo nmap --stylesheet https://raw.githubusercontent.com/honze-net/nmap-bootstrap-xsl/master/nmap-bootstrap.xsl -sSUV -T4   -r -O -p$1'"
   if [ -z "$1" ]; then 
   echo "!!  This command requires a list of ports as the first argument and optionally an output filename as a second argument"
   echo "!!  Example: 80,443,8080 or 1-1024"
   else 
     if [ -z "$2" ]; then 
-    sudo nmap -sSUV -T4   -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/udpports-$1-1-$(date +%F)"
+    sudo nmap --stylesheet https://raw.githubusercontent.com/honze-net/nmap-bootstrap-xsl/master/nmap-bootstrap.xsl -sSUV -T4   -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/udpports-$1-1-$(date +%F)"
     else 
-    sudo nmap -sSUV -T4   -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/udpports-$2-1-$(date +%F)"
+    sudo nmap --stylesheet https://raw.githubusercontent.com/honze-net/nmap-bootstrap-xsl/master/nmap-bootstrap.xsl -sSUV -T4   -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/udpports-$2-1-$(date +%F)"
     fi
   fi
-  echo "running second version scan 'sudo nmap -sSUV -T4   -r -O -p$1'"
+  echo "running second version scan 'sudo nmap --stylesheet https://raw.githubusercontent.com/honze-net/nmap-bootstrap-xsl/master/nmap-bootstrap.xsl -sSUV -T4   -r -O -p$1'"
   if [ -z "$1" ]; then 
   echo "!!  This command requires a list of ports as the first argument and optionally an output filename as a second argument"
   echo "!!  Example: 80,443,8080 or 1-1024  "
   else 
     if [ -z "$2" ]; then 
-    sudo nmap -sSUV -T4   -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/udpports-$1-2-$(date +%F)"
+    sudo nmap --stylesheet https://raw.githubusercontent.com/honze-net/nmap-bootstrap-xsl/master/nmap-bootstrap.xsl -sSUV -T4   -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/udpports-$1-2-$(date +%F)"
     else 
-    sudo nmap -sSUV -T4   -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/udpports-$2-2-$(date +%F)"
+    sudo nmap --stylesheet https://raw.githubusercontent.com/honze-net/nmap-bootstrap-xsl/master/nmap-bootstrap.xsl -sSUV -T4   -r -O -p$1 -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/udpports-$2-2-$(date +%F)"
     fi
   fi
   echo "version scans complete"
