@@ -8,24 +8,24 @@ xmasscan () {
   fi
   
   echo "results will be stored in $workspace/.scanning/nmap/..."
-  echo "running first xmas scan 'sudo nmap -sXV -Pn -r -O'"
+  echo "running first xmas scan 'sudo nmap -sX -T4 -r -O'"
   if [ -z "$1" ]; then 
-    sudo nmap -sXV -Pn -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/xmasscan-.targets-1-$(date +%F)"
+    sudo nmap -sX -T4 -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/xmasscan-.targets-1-$(date +%F)"
   else 
     if [ -z "$2" ]; then 
-    sudo nmap -sXV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/xmasscan-$1-1-`$(date +%F)date | sed 's/ /./g'`"
+    sudo nmap -sX -T4 -r -O -iL $1 -oA "$workspace/.scanning/nmap/xmasscan-$1-1-`$(date +%F)date | sed 's/ /./g'`"
     else 
-    sudo nmap -sXV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/xmasscan-$2-1-$(date +%F)"
+    sudo nmap -sX -T4 -r -O -iL $1 -oA "$workspace/.scanning/nmap/xmasscan-$2-1-$(date +%F)"
     fi
   fi
-  echo "running second xmas scan 'sudo nmap -sXV -Pn -r -O'"
+  echo "running second xmas scan 'sudo nmap -sX -T4 -r -O'"
   if [ -z "$1" ]; then 
-    sudo nmap -sXV -Pn -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/xmasscan-.targets-2-$(date +%F)"
+    sudo nmap -sX -T4 -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/xmasscan-.targets-2-$(date +%F)"
   else 
     if [ -z "$2" ]; then 
-    sudo nmap -sXV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/xmasscan-$1-2-$(date +%F)"
+    sudo nmap -sX -T4 -r -O -iL $1 -oA "$workspace/.scanning/nmap/xmasscan-$1-2-$(date +%F)"
     else 
-    sudo nmap -sXV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/xmasscan-$2-2-$(date +%F)"
+    sudo nmap -sX -T4 -r -O -iL $1 -oA "$workspace/.scanning/nmap/xmasscan-$2-2-$(date +%F)"
     fi
   fi
   echo "xmas scans complete"

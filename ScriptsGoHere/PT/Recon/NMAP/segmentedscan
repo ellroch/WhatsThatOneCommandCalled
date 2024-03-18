@@ -1,0 +1,53 @@
+#!/bin/zsh
+# run a nse scan of a given target list
+# defaults to the target list in the workspace $workspace/.conf/.targets
+# writes results to $workspace/.scanning/nmap/...
+segmented () {
+  if [ ! -d "$workspace/.scanning/nmap" ]; then
+    mkdir $workspace/.scanning/nmap
+  fi
+
+  echo "segmentedscan will take a portscan command as input and it will call that command on all 65535 ports, breaking it up into multiple scans targetting smaller port ranges. it will always use the contents of $workspace/.conf/.targets as the target list."
+  echo "this command accepts four arguments -> 1) scan type, start port, end port, number of segments"
+  echo "example: segmentedscan versionscan 1 65535 6" 
+  echo "if no arguments are provided the default scan is a version scan on all ports as seen above in six even segments (~10k ports per segment). for unreliable targets, higher segmentation is recommended, However, collating the output will become more difficult. Consider using a script to compile all the xml output into a single report."
+  echo "leaving off the third argument will scan from the provided port all the way to the port 65535 - easy for continung a scan if a target crashed midway"
+  echo "results will be stored in $workspace/.scanning/nmap/..."
+  
+# Default values
+scan_to_run=${1:-"versionscan"}
+start_port=${2:-1}
+end_port=${3:-65535}
+segments=${4:-6}
+
+
+# Calculate segment size
+segment_size=$(( (end_port - start_port) / segments ))
+
+# Initialize current start and end ports for the first segment
+current_start=$start_port
+current_end=$((current_start + segment_size - 1))
+
+# Initialize a counter for the loop
+counter=0
+
+# Loop through each segment
+while [ $counter -lt $segments ]; do
+  # Adjust current_end for the last segment to ensure it includes the end_port
+  if [ $((counter + 1)) -eq $segments ]; then
+    current_end=$end_port
+  fi
+  # Run Command for this segment
+  echo "running segment $((counter + 1)) of $segments"
+  $scan_to_run $current_start\-$current_end
+
+  # Update current_start and current_end for the next segment
+  current_start=$((current_end + 1))
+  current_end=$((current_start + segment_size - 1))
+
+  # Increment the counter
+  counter=$((counter + 1))
+done
+  
+  echo "segmented scan complete"
+};

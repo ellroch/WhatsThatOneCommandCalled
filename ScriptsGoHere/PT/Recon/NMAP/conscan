@@ -8,24 +8,24 @@ conscan () {
   fi
 
   echo "results will be stored in $workspace/.scanning/nmap/..."
-  echo "running first tcp connect scan 'sudo nmap -sTV -Pn -r -O'"
+  echo "running first tcp connect scan 'sudo nmap -sT -T4 -r -O'"
   if [ -z "$1" ]; then 
-  sudo nmap -sTV -Pn -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/conscan-.targets-1-$(date +%F)"
+  sudo nmap -sT -T4 -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/conscan-.targets-1-$(date +%F)"
   else 
     if [ -z "$2" ]; then 
-    sudo nmap -sTV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/conscan-$1-1-$(date +%F)"
+    sudo nmap -sT -T4 -r -O -iL $1 -oA "$workspace/.scanning/nmap/conscan-$1-1-$(date +%F)"
     else 
-    sudo nmap -sTV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/conscan-$2-1-$(date +%F)"
+    sudo nmap -sT -T4 -r -O -iL $1 -oA "$workspace/.scanning/nmap/conscan-$2-1-$(date +%F)"
     fi
   fi
-  echo "running second tcp connect scan 'sudo nmap -sTV -Pn -r -O'"
+  echo "running second tcp connect scan 'sudo nmap -sT -T4 -r -O'"
   if [ -z "$1" ]; then 
-  sudo nmap -sTV -Pn -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/conscan-.targets-2-$(date +%F)"
+  sudo nmap -sT -T4 -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/conscan-.targets-2-$(date +%F)"
   else 
     if [ -z "$2" ]; then 
-    sudo nmap -sTV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/conscan-$1-2-$(date +%F)"
+    sudo nmap -sT -T4 -r -O -iL $1 -oA "$workspace/.scanning/nmap/conscan-$1-2-$(date +%F)"
     else 
-    sudo nmap -sTV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/conscan-$2-2-$(date +%F)"
+    sudo nmap -sT -T4 -r -O -iL $1 -oA "$workspace/.scanning/nmap/conscan-$2-2-$(date +%F)"
     fi
   fi
   echo "tcp connect scans complete"

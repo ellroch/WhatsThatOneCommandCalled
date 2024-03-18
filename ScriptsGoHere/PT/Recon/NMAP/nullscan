@@ -8,24 +8,24 @@ nullscan () {
   fi
 
   echo "results will be stored in $workspace/.scanning/nmap/..."
-  echo "running first null scan 'sudo nmap -sNV -Pn -r -O'"
+  echo "running first null scan 'sudo nmap -sN -T4 -p- -r -O'"
   if [ -z "$1" ]; then 
-    sudo nmap -sNV -Pn -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/nullscan-.targets-1-$(date +%F)"
+    sudo nmap -sN -T4 -p- -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/nullscan-.targets-1-$(date +%F)"
   else 
     if [ -z "$2" ]; then 
-    sudo nmap -sNV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/nullscan-$1-1-$(date +%F)"
+    sudo nmap -sN -T4 -p- -r -O -iL $1 -oA "$workspace/.scanning/nmap/nullscan-$1-1-$(date +%F)"
     else 
-    sudo nmap -sNV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/nullscan-$2-1-$(date +%F)"
+    sudo nmap -sN -T4 -p- -r -O -iL $1 -oA "$workspace/.scanning/nmap/nullscan-$2-1-$(date +%F)"
     fi
   fi
-  echo "running second null scan 'sudo nmap -sNV -Pn -r -O'"
+  echo "running second null scan 'sudo nmap -sN -T4 -p- -r -O'"
   if [ -z "$1" ]; then 
-    sudo nmap -sNV -Pn -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/nullscan-.targets-2-$(date +%F)"
+    sudo nmap -sN -T4 -p- -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/nullscan-.targets-2-$(date +%F)"
   else 
     if [ -z "$2" ]; then 
-    sudo nmap -sNV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/nullscan-$1-2-$(date +%F)"
+    sudo nmap -sN -T4 -p- -r -O -iL $1 -oA "$workspace/.scanning/nmap/nullscan-$1-2-$(date +%F)"
     else 
-    sudo nmap -sNV -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/nullscan-$2-2-$(date +%F)"
+    sudo nmap -sN -T4 -p- -r -O -iL $1 -oA "$workspace/.scanning/nmap/nullscan-$2-2-$(date +%F)"
     fi
   fi
   echo "null scans complete"

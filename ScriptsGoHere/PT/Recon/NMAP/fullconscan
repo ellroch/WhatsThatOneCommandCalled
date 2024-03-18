@@ -8,24 +8,24 @@ fullconscan () {
   fi
 
   echo "results will be stored in $workspace/.scanning/nmap/..."
-  echo "running first tcp connect scan of all 65535 ports 'sudo nmap -sTV -p- -Pn -r -O'"
+  echo "running first tcp connect scan of all 65535 ports 'sudo nmap -sT -T4 -p- -r -O'"
   if [ -z "$1" ]; then 
-  sudo nmap -sTV -p- -Pn -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/fullconscan_65k-.targets-1-$(date +%F)"
+  sudo nmap -sT -T4 -p- -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/fullconscan_65k-.targets-1-$(date +%F)"
   else 
     if [ -z "$2" ]; then 
-    sudo nmap -sTV -p- -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/fullconscan_65k-$1-1-$(date +%F)"
+    sudo nmap -sT -T4 -p- -r -O -iL $1 -oA "$workspace/.scanning/nmap/fullconscan_65k-$1-1-$(date +%F)"
     else 
-    sudo nmap -sTV -p- -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/fullconscan_65k-$2-1-$(date +%F)"
+    sudo nmap -sT -T4 -p- -r -O -iL $1 -oA "$workspace/.scanning/nmap/fullconscan_65k-$2-1-$(date +%F)"
     fi
   fi
-  echo "running second tcp connect scan of all 65535 ports 'sudo nmap -sTV -p- -Pn -r -O'"
+  echo "running second tcp connect scan of all 65535 ports 'sudo nmap -sT -T4 -p- -r -O'"
   if [ -z "$1" ]; then 
-  sudo nmap -sTV -p- -Pn -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/fullconscan_65k-.targets-2-$(date +%F)"
+  sudo nmap -sT -T4 -p- -r -O -iL $workspace/.conf/.targets -oA "$workspace/.scanning/nmap/fullconscan_65k-.targets-2-$(date +%F)"
   else 
     if [ -z "$2" ]; then 
-    sudo nmap -sTV -p- -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/fullconscan_65k-$1-2-$(date +%F)"
+    sudo nmap -sT -T4 -p- -r -O -iL $1 -oA "$workspace/.scanning/nmap/fullconscan_65k-$1-2-$(date +%F)"
     else 
-    sudo nmap -sTV -p- -Pn -r -O -iL $1 -oA "$workspace/.scanning/nmap/fullconscan_65k-$2-2-$(date +%F)"
+    sudo nmap -sT -T4 -p- -r -O -iL $1 -oA "$workspace/.scanning/nmap/fullconscan_65k-$2-2-$(date +%F)"
     fi
   fi
   echo "syn/udp scans complete"
