@@ -1,0 +1,32 @@
+#!/bin/zsh
+# sets sorts the output files of nmaps -oA results in $workspace/.scanning/nmap into subdirectories
+sortscans () {
+# Define the base directory
+base_dir="${workspace}/.scanning/nmap"
+
+# Define the target directories
+gnmap_dir="${base_dir}/gnmap"
+nmap_dir="${base_dir}/nmap"
+xml_dir="${base_dir}/xml"
+
+# Check and create gnmap directory if it doesn't exist
+if [[ ! -d "$gnmap_dir" ]]; then
+  mkdir -p "$gnmap_dir"
+fi
+
+# Check and create nmap directory if it doesn't exist
+if [[ ! -d "$nmap_dir" ]]; then
+  mkdir -p "$nmap_dir"
+fi
+
+# Check and create xml directory if it doesn't exist
+if [[ ! -d "$xml_dir" ]]; then
+  mkdir -p "$xml_dir"
+fi
+
+# Move the files to their respective directories
+mv "${base_dir}"/*.gnmap "$gnmap_dir"/
+mv "${base_dir}"/*.nmap "$nmap_dir"/
+mv "${base_dir}"/*.xml "$xml_dir"/
+
+};
