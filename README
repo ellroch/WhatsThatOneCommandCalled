@@ -13,6 +13,8 @@
 #  for any lines that require you to update links to this or other directories,
 #  otheriwse these custom variables can be copied directly into the .zshrc file.
 #  do not copy the main functions - those are just documentation of other commands in this directory.
+
+
 #=======================================================================================
 ### custom enviornment variables (defaults) to add to the .zshrc file for these scripts
 #=======================================================================================
