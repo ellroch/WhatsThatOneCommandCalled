@@ -2,7 +2,7 @@
 # run a nse scan of a given target list
 # defaults to the target list in the workspace $workspace/.conf/.targets
 # writes results to $workspace/.scanning/nmap/...
-udpports () {
+versionscan () {
   if [ ! -d "$workspace/.scanning/nmap" ]; then
     mkdir $workspace/.scanning/nmap
   fi
