@@ -8,20 +8,4 @@ segmentedscan () {
       [start_port] 
       [end_port] 
       [number_of_segments]"
-        
-  
-  
-  
-  echo "segmentedports will take a portscan command as input and it will call that command on all 65535 ports, breaking it up into multiple scans targetting smaller port ranges. it will always use the contents of $workspace/.conf/.targets as the target list."
-  echo "this command accepts four arguments -> 1) scan type, start port, end port, number of segments"
-  echo "example: segmentedports versionscan 1 65535 6" 
-  echo "if no arguments are provided the default scan is a version scan on all ports as seen above in six even segments (~10k ports per segment). for unreliable targets, higher segmentation is recommended, However, collating the output will become more difficult. Consider using a script to compile all the xml output into a single report."
-  echo "leaving off the third argument will scan from the provided port all the way to the port 65535 - easy for continung a scan if a target crashed midway"
-  echo "results will be stored in $workspace/.scanning/nmap/..."
-# Default values
-scan_to_run=${1:-"versionscan"}
-start_port=${2:-1}
-end_port=${3:-65535}
-segments=${4:-6}
-
 };
