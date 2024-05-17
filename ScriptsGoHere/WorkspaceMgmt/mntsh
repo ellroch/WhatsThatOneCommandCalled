@@ -1,0 +1,43 @@
+#!/bin/zsh
+# Summary:
+# mounts a shared folder, adds a shortcut to it on the desktop
+
+# Assumptions: (used for later scripting to incorporate variables / a conf file)
+# assumes open-vm-tools and open-vm-tools-desktop are already installed
+# this is run from a kali VM in VMware
+# the shared folder is configured in VMware with the exact name "Shared Files"
+
+# What this Does:
+# Makes directory /mnt/hgfs/SharedFiles
+# mounts VMware Host Share named "Shared Files" to /mnt/hgfs/SharedFiles
+# creates symlink on ~/Desktop called "SharedFiles" to /mnt/hgfs/SharedFiles
+
+
+# $1 = name of Host Share
+# 
+# 
+mntsh () {
+
+if [ -z "$1" ]; then
+  echo "No argument provided"
+  echo "enter the name of the Host Share as configured in your VM settings"
+  echo "i.e. \"Shared Files\""
+else
+  echo "Making sure vmtools are running"
+  echo "  > sudo systemctl start open-vm-tools"
+  echo "  > sudo systemctl enable open-vm-tools"
+  sudo systemctl start open-vm-tools
+  sudo systemctl enable open-vm-tools
+  
+  echo "Mounting Host Share"
+  echo "  > sudo -p mkdir /mnt/hgfs/$1"
+  echo "  > sudo vmhgfs-fuse ".host:$1" /mnt/hgfs/$1 -o allow_other"
+  sudo mkdir -p /mnt/hgfs/$1
+  sudo vmhgfs-fuse ".host:$1" /mnt/hgfs/$1 -o allow_other
+
+  echo "Creading Desktop Shortcut"
+  echo "  > ln -sf "/mnt/hgfs/$1" ~/Desktop/$1"
+  ln -sf "/mnt/hgfs/$1" ~/Desktop/$1
+fi
+
+};

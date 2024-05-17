@@ -1,0 +1,28 @@
+#!/bin/zsh
+# Summary:
+# unmounts the directory named in argument 1
+# removes associated mount dir in /mnt/hgfs
+# removes associated Desktop Shortcut
+
+unmnt () {
+
+if [ -z "$1" ]; then
+  echo "No argument provided"
+  echo "enter the name of the  directory to unmount from /mnt/hgfs/\$1"
+  echo "Mounts in /mnt/hgfs:
+  > df -h | grep /mnt/hgfs"
+  df -h | grep /mnt/hgfs
+else
+  echo "unmounting from /mnt/hgfs/$1"
+  sudo fusermount -u /mnt/hgfs/$1
+  echo "confirm with either:
+  > ls /mnt/hgfs/$1
+  > mount | grep /mnt/hgfs/$1
+  > df -h | grep /mnt/hgfs"
+  
+  echo "rm ~/Desktop/$1"
+  echo "sudo rmdir /mnt/hgfs/$1"
+  rm ~/Desktop/$1
+  sudo rmdir /mnt/hgfs/$1
+fi
+};
