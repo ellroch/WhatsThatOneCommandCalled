@@ -3,7 +3,7 @@
 
 htb () {
 	echo "sudo mousepad etc/hosts "
-	echo "sudo mousepad etc/resolv.conf "
 	sudo mousepad /etc/hosts 
+	echo "sudo mousepad etc/resolv.conf "
 	sudo mousepad /etc/resolv.conf 
 };
