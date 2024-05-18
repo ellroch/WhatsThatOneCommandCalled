@@ -1,0 +1,9 @@
+#!/bin/zsh
+# opens a word processor for both etc/hosts and etc/resolv.conf
+
+htb () {
+	echo "sudo mousepad etc/hosts "
+	echo "sudo mousepad etc/resolv.conf "
+	sudo mousepad /etc/hosts 
+	sudo mousepad /etc/resolv.conf 
+};
