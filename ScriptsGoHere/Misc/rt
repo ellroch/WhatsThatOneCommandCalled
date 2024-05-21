@@ -1,0 +1,34 @@
+#!/bin/zsh
+# this will generate rainbowtables from the worldist passed to it using rtgen
+
+# !!!! WITHOUT EDITING, THIS WILL PRODUCE PROBABLY 1TB OF TABLES FROM ROCKYOU... PLEASE ADJUST FOR YOUR SYSTEM REQUIREMENTS !!!! 
+
+rt () {
+	# MD5
+	rtgen md5 $1 1 8 0 40000 134217728 0
+	rtgen md5 $1 1 8 1 40000 134217728 1
+	rtgen md5 $1 1 8 2 40000 134217728 2
+
+	# SHA1
+	rtgen sha1 $1 1 8 0 40000 134217728 0
+	rtgen sha1 $1 1 8 1 40000 134217728 1
+	rtgen sha1 $1 1 8 2 40000 134217728 2
+
+	# NTLM
+	rtgen ntlm $1 1 8 0 40000 134217728 0
+	rtgen ntlm $1 1 8 1 40000 134217728 1
+	rtgen ntlm $1 1 8 2 40000 134217728 2
+
+	# SHA-256
+	rtgen sha256 $1 1 8 0 40000 67108864 0
+	rtgen sha256 $1 1 8 1 40000 67108864 1
+	rtgen sha256 $1 1 8 2 40000 67108864 2
+
+	# SHA-512
+	rtgen sha512 $1 1 8 0 40000 33554432 0
+	rtgen sha512 $1 1 8 1 40000 33554432 1
+	rtgen sha512 $1 1 8 2 40000 33554432 2
+
+	# Sort the tables
+	rtsort .
+};
