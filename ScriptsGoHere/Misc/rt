@@ -1,9 +1,12 @@
 #!/bin/zsh
-# this will generate rainbowtables from the worldist passed to it using rtgen
+# tr -d '\n' < $1 | fold -w1 | sort -u | tr -d '\n' > wl.charset
+# the above command will reduce a wordlist (at $1) to a charset and then
 
+# this script will generate rainbowtables from a charset (i.e. the one above) using rtgen
 # !!!! WITHOUT EDITING, THIS WILL PRODUCE PROBABLY 1TB OF TABLES FROM ROCKYOU... PLEASE ADJUST FOR YOUR SYSTEM REQUIREMENTS !!!! 
 
 rt () {
+
 	# MD5
 	rtgen md5 $1 1 8 0 40000 134217728 0
 	rtgen md5 $1 1 8 1 40000 134217728 1
@@ -24,10 +27,10 @@ rt () {
 	rtgen sha256 $1 1 8 1 40000 67108864 1
 	rtgen sha256 $1 1 8 2 40000 67108864 2
 
-	# SHA-512
-	rtgen sha512 $1 1 8 0 40000 33554432 0
-	rtgen sha512 $1 1 8 1 40000 33554432 1
-	rtgen sha512 $1 1 8 2 40000 33554432 2
+	# SHA-512 --- not supported by rtgen :(
+	# rtgen sha512 $1 1 8 0 40000 33554432 0
+	# rtgen sha512 $1 1 8 1 40000 33554432 1
+	# rtgen sha512 $1 1 8 2 40000 33554432 2
 
 	# Sort the tables
 	rtsort .
