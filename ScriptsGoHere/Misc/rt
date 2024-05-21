@@ -1,9 +1,5 @@
 #!/bin/zsh
-# tr -d '\n' < $1 | fold -w1 | sort -u | tr -d '\n' > wl.charset
-# the above command will reduce a wordlist (at $1) to a charset and then
-# Copy the contents of this wordlist into the rainbowcrack charset.txt and label it accordingly to use this charset
-
-# this script will generate rainbowtables from a charset (i.e. the one above) using rtgen
+# this script will generate a number of sets of rainbow tables
 # !!!! WITHOUT EDITING, THIS WILL PRODUCE PROBABLY 1TB OF TABLES FROM ROCKYOU... PLEASE ADJUST FOR YOUR SYSTEM REQUIREMENTS !!!! 
 
 rt () {
